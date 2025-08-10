@@ -3,13 +3,19 @@ const express = require("express");
 const cors = require("cors");
 const app = express();
 
+//Rutas
+const sentimentRoute = require("./routes/sentiment");
+
 app.use(cors());
 app.use(express.json());
+
+app.use("/sentiment", sentimentRoute);
 
 app.get("/", (req, res) => {
   res.send("Backend de TerappIA funcionando");
 });
 
+//Servidor
 app.listen(3001, () => {
   console.log("Servidor backend en puerto 3001");
 });
