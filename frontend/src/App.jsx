@@ -1,10 +1,12 @@
+import SentimentTester from "./SentimentTester";
+
 function App() {
   return (
-    <div className="min-h-screen bg-blue-100 flex flex-col items-center justify-center p-6">
-      <h1 className="text-4xl font-bold text-blue-800">✅ Tailwind funcionando</h1>
-      <p className="mt-4 text-lg text-gray-700">
-        Ya puedes empezar a desarrollar TerappIA MVP.
-      </p>
+    <div className="min-h-screen flex flex-col items-center p-6 bg-gray-100">
+      <h1 className="text-3xl font-bold mb-6 text-blue-600">
+        TerappIA - Prueba de Análisis de Sentimientos
+      </h1>
+      <SentimentTester />
     </div>
   );
 }
