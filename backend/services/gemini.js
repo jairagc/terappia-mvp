@@ -61,10 +61,16 @@ Texto: ${text}
 
   // Obtenemos texto de la respuesta
   const rawText = result.response.text();
+  console.log("Respuesta cruda de Gemini:", rawText);
+
+  // Limpieza para extraer solo el JSON
+  const jsonStart = rawText.indexOf("{");
+  const jsonEnd = rawText.lastIndexOf("}");
+  const jsonString = rawText.substring(jsonStart, jsonEnd + 1);
 
   // Intentamos convertirlo a JSON
   try {
-    return JSON.parse(rawText);
+    return JSON.parse(jsonString);
   } catch (error) {
     console.error("Error al parsear JSON de Gemini:", error);
     throw new Error("Respuesta de Gemini no es JSON válido");
