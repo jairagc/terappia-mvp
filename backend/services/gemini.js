@@ -32,8 +32,6 @@ Analiza el siguiente texto escrito por un paciente usando ABSA (Aspect-Based Sen
 3. Detecta indicadores de riesgo: ideación suicida, autolesiones, uso de sustancias.
 4. Devuelve SOLO un JSON válido con el siguiente formato:
 {
-  "patient_id": "<string>",
-  "timestamp": "<ISO8601 datetime>",
   "texto_original": "<string>",
   "analysis": [
     {

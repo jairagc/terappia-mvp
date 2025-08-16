@@ -35,7 +35,7 @@ async function saveAnalysis(patientId, data) {
   };
 
   await docRef.set(payload);
-  return { id: docRef.id, ...payload };
+  return { patient_id: patientId, id: docRef.id, ...payload };
 }
 
 /**
