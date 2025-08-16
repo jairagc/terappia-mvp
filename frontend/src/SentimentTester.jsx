@@ -34,6 +34,7 @@ export default function SentimentTester() {
     try {
       const formData = new FormData();
       formData.append("image", imageFile);
+      formData.append("patient_id", "paciente_prueba");
 
       const response = await axios.post("http://localhost:3001/ocr", formData, {
         headers: { "Content-Type": "multipart/form-data" },

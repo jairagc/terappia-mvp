@@ -12,12 +12,18 @@ const upload = multer({ dest: 'uploads/' });
 
 router.post('/', upload.single('image'), async (req, res) => {
 // Linea para comprobar que la ruta recibe la imagen
- console.log("Archivo recibido:", req.file);
+ //console.log("Archivo recibido:", req.file);
 
   try {
     const path = require('path');
     const imagePath = path.resolve(req.file.path);
-    console.log("Ruta absoluta de la imagen:", imagePath);
+    //console.log("Ruta absoluta de la imagen:", imagePath);
+
+    const { patient_id } = req.body;
+
+    if (!patient_id) {
+      return res.status(400).json({ error: "Falta el campo 'patient_id'" });
+    }
 
     // 1️⃣ Extraer texto con OCR
     const extractedText = await extractTextFromImage(imagePath);
@@ -25,13 +31,13 @@ router.post('/', upload.single('image'), async (req, res) => {
 
 
     // 2️⃣ Pasar el texto a Gemini para análisis de sentimientos
-    const sentimentResult = await analyzeSentiment(extractedText, 'paciente_ocr');
+    const sentimentResult = await analyzeSentiment(extractedText, patient_id);
 
     // Eliminar el archivo temporal
     fs.unlinkSync(imagePath);
 
     res.json({
-      ocr_text: extractedText,
+      //ocr_text: extractedText,
       sentiment_analysis: sentimentResult,
     });
   } catch (error) {
