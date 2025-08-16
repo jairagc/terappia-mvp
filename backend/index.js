@@ -6,12 +6,14 @@ const app = express();
 //Rutas
 const sentimentRoute = require("./routes/sentiment");
 const ocrRoute = require('./routes/ocr');
+const historyRoute = require("./routes/history");
 
 app.use(cors());
 app.use(express.json());
 
 app.use("/sentiment", sentimentRoute);
 app.use('/ocr', ocrRoute);
+app.use("/history", historyRoute);
 
 app.get("/", (req, res) => {
   res.send("Backend de TerappIA funcionando");

@@ -4,98 +4,125 @@ import JSONPretty from "react-json-pretty";
 import "react-json-pretty/themes/monikai.css";
 
 export default function SentimentTester() {
-  const [inputText, setInputText] = useState("");
-  const [imageFile, setImageFile] = useState(null);
+  const [patientId, setPatientId] = useState("");
+  const [text, setText] = useState("");
+  const [file, setFile] = useState(null);
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  // Análisis de texto manual
   const analyzeText = async () => {
-    if (!inputText.trim()) return setError("Escribe un texto antes de analizar.");
-    setLoading(true);
+    if (!text.trim() || !patientId.trim()) {
+      return setError("Debes ingresar texto y un ID de paciente.");
+    }
     setError("");
+    setLoading(true);
     try {
       const response = await axios.post("http://localhost:3001/sentiment", {
-        text: inputText,
-        patient_id: "paciente_prueba",
+        text,
+        patient_id: patientId,
       });
       setResult(response.data);
-    } catch {
-      setError("Ocurrió un error en el análisis de texto.");
+    } catch (err) {
+      setError("Error al analizar el texto.");
     } finally {
       setLoading(false);
     }
   };
 
+  // Análisis con OCR
   const analyzeImage = async () => {
-    if (!imageFile) return setError("Sube una imagen antes de analizar.");
-    setLoading(true);
+    if (!file || !patientId.trim()) {
+      return setError("Debes seleccionar una imagen y un ID de paciente.");
+    }
     setError("");
+    setLoading(true);
     try {
       const formData = new FormData();
-      formData.append("image", imageFile);
+      formData.append("image", file);
+      formData.append("patient_id", patientId);
 
       const response = await axios.post("http://localhost:3001/ocr", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-
       setResult(response.data);
-    } catch {
-      setError("Ocurrió un error en el análisis de imagen.");
+    } catch (err) {
+      setError("Error al analizar la imagen.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-blue-100 p-6">
-      <div className="max-w-3xl mx-auto bg-white rounded-lg shadow-lg p-6 space-y-6">
-        <h1 className="text-3xl font-bold text-blue-700">Análisis de Sentimientos (Gemini + OCR)</h1>
+    <div className="max-w-3xl mx-auto bg-white rounded-lg shadow-lg p-6 space-y-6">
+      <h1 className="text-2xl font-bold text-blue-700">Analizador de Sentimientos</h1>
 
-        {/* Texto manual */}
+      {/* Input para ID del paciente */}
+      <div>
+        <label className="block text-gray-700 font-semibold mb-2">
+          ID del paciente:
+        </label>
+        <input
+          type="text"
+          placeholder="Ejemplo: paciente001"
+          value={patientId}
+          onChange={(e) => setPatientId(e.target.value)}
+          className="w-full border border-blue-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+
+      {/* Entrada de texto manual */}
+      <div>
+        <label className="block text-gray-700 font-semibold mb-2">
+          Texto a analizar:
+        </label>
         <textarea
-          className="w-full border border-blue-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          rows="5"
-          placeholder="Escribe aquí el texto a analizar..."
-          value={inputText}
-          onChange={(e) => setInputText(e.target.value)}
-        ></textarea>
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          rows="4"
+          placeholder="Escribe el texto aquí..."
+          className="w-full border border-blue-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
         <button
           onClick={analyzeText}
-          className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+          className="mt-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
           disabled={loading}
         >
-          {loading ? "Analizando..." : "Analizar texto"}
+          {loading ? "Analizando..." : "Analizar Texto"}
         </button>
-
-        {/* Subir imagen */}
-        <div className="border-t pt-4">
-          <input
-            type="file"
-            accept="image/*"
-            onChange={(e) => setImageFile(e.target.files[0])}
-            className="mb-2"
-          />
-          <button
-            onClick={analyzeImage}
-            className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-            disabled={loading}
-          >
-            {loading ? "Procesando imagen..." : "Analizar imagen"}
-          </button>
-        </div>
-
-        {/* Errores */}
-        {error && <p className="text-red-500">{error}</p>}
-
-        {/* Resultado */}
-        {result && (
-          <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-            <h2 className="text-lg font-semibold text-blue-700 mb-2">Resultado</h2>
-            <JSONPretty data={result} />
-          </div>
-        )}
       </div>
+
+      {/* Subida de imagen */}
+      <div>
+        <label className="block text-gray-700 font-semibold mb-2">
+          Imagen para OCR:
+        </label>
+        <input
+          type="file"
+          accept="image/*"
+          onChange={(e) => setFile(e.target.files[0])}
+          className="w-full"
+        />
+        <button
+          onClick={analyzeImage}
+          className="mt-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+          disabled={loading}
+        >
+          {loading ? "Procesando..." : "Analizar Imagen"}
+        </button>
+      </div>
+
+      {/* Errores */}
+      {error && <p className="text-red-500">{error}</p>}
+
+      {/* Resultados */}
+      {result && (
+        <div className="mt-6 bg-gray-50 border border-gray-200 rounded-lg p-4 shadow-sm">
+          <h2 className="text-xl font-semibold text-blue-600 mb-2">Resultado</h2>
+          <JSONPretty data={result} />
+        </div>
+      )}
     </div>
   );
 }
