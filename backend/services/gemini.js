@@ -61,7 +61,7 @@ Texto: ${text}
 
   // Obtenemos texto de la respuesta
   const rawText = result.response.text();
-  console.log("Respuesta cruda de Gemini:", rawText);
+  //console.log("Respuesta cruda de Gemini:", rawText);
 
   // Limpieza para extraer solo el JSON
   const jsonStart = rawText.indexOf("{");

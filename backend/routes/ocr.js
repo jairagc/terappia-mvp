@@ -4,6 +4,7 @@ const path = require('path');
 const fs = require('fs');
 const { extractTextFromImage } = require('../services/ocr');
 const { analyzeSentiment } = require('../services/gemini');
+const { saveAnalysis } = require("../services/firestore");
 
 const router = express.Router();
 
@@ -12,7 +13,7 @@ const upload = multer({ dest: 'uploads/' });
 
 router.post('/', upload.single('image'), async (req, res) => {
 // Linea para comprobar que la ruta recibe la imagen
- //console.log("Archivo recibido:", req.file);
+//console.log("Archivo recibido:", req.file);
 
   try {
     const path = require('path');
@@ -36,10 +37,15 @@ router.post('/', upload.single('image'), async (req, res) => {
     // Eliminar el archivo temporal
     fs.unlinkSync(imagePath);
 
-    res.json({
-      //ocr_text: extractedText,
-      sentiment_analysis: sentimentResult,
+    // Guardar en Firestore
+    const saved = await saveAnalysis(patient_id, {
+      text_original: extractedText,
+      source: "ocr",
+      sentiment_result: sentimentResult,
     });
+
+    res.json(saved);
+
   } catch (error) {
     res.status(500).json({ error: 'Error procesando OCR', detalle: error.message });
   }

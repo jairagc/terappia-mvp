@@ -30,14 +30,8 @@ async function saveAnalysis(patientId, data) {
   const payload = {
     text_original: data.text_original,
     source: data.source,
-    ocr_text: data.ocr_text || null,
     sentiment_result: data.sentiment_result,
     timestamp: admin.firestore.FieldValue.serverTimestamp(),
-    flags: data.flags || {
-      suicidal_ideation: false,
-      self_harm: false,
-      substance_use: false,
-    },
   };
 
   await docRef.set(payload);
